@@ -1,0 +1,232 @@
+---
+title: "Tidyverse in R: Tools for Data Manipulation"
+author: "Kris Eberwein"
+date: "February 10, 2017"
+output: 
+  html_document: 
+    toc: yes
+    toc_float: yes
+    theme: united
+---
+```{r setup, include=FALSE, warning=FALSE}
+#knitr::opts_chunk$set(echo = FALSE)
+pkgs <-c('Lahman','dplyr', 'tidyr')
+for(p in pkgs) if(p %in% rownames(installed.packages()) == FALSE) {install.packages(p, repos='http://cran.us.r-project.org')}
+for(p in pkgs) suppressPackageStartupMessages(library(p, quietly=TRUE, character.only=TRUE))
+options("getSymbols.warning4.0"=FALSE)
+```
+
+### Introduction
+
+This walk-through provides a brief introduction to the `dplyr` and `tidyr` packages in R that allow us to reshape our data for visualization or analysis. We will analyse Major League Baseball data from the `Lahaman` package. For convenience, the “base R” equivalents to the `dplyr` and `tidy` functions at bottom of each code block.
+
+### Load the libraries we will need.
+
+```{r}
+library(Lahman)
+library(dplyr)
+library(tidyr)
+```
+
+## Loading Data
+
+R can load data from rational and unstructured databases as well as just about any file format one could imagine. For our use case, we will load an R data package called `Lahman`. This package load Sean Lahman's baseball database, which is an annual aggregation of statistics for all major league players from 1871 to present.
+
+```{r}
+library(Lahman)
+# Load the Batting table from the Lahman database.
+batting <- Lahman::Batting
+# Take a look at the first few rows of the data set.
+head(Batting, 3)
+
+# Get Player names and Teams names from other tables
+teams <- Lahman::Teams
+master <- Lahman::Master
+```
+
+## Manipulating Data with dplyr
+
+**GOAL:** Add full player names from the `master` data frame to the `batting` data frame.
+
+The dplyr package has several "join" functions, many of which are similar, in concept, to SQL joins. Full descriptions of dplyr joins can be [found here](http://stat545.com/bit001_dplyr-cheatsheet.html). For our use, a left join is the most appropriate.
+
+
+```{r}
+library(dplyr)
+# Subset master table to only playerID and player names since that's all we need.
+master <- select(master, playerID, nameFirst, nameLast)
+
+# Left join master and batting to get the player names in master
+battingPlayer <- left_join(master, batting, by = "playerID")
+
+# Base R equivalent:
+# master <- master[, c("playerID", "nameFirst", "nameLast")]
+# battingPlayer <- merge(x = master, y = batting, by = "playerID", all.x = TRUE)
+
+```
+
+We can use the same strategy as above to add full team names to the data set. **Notw** the use of the `rename()` function to rename the ambiguous column "name" to "teamName."
+
+```{r}
+teamsYr <- select(teams, teamID, yearID, name)
+# Rename the team name column to avoid confusion
+teamsYr <- rename(teamsYr, "teamName" = name)
+batting <- left_join(battingPlayer, teamsYr, by = c("teamID", "yearID"))
+
+# Base R equivalent:
+# teamsYr <- teams[, c("teams", "teamID", "yearID", "name")]
+# batting <- merge(x = battingPlayer, y = teamsYr, by = c("tea,ID", "yearID"), all.x = TRUE)
+
+head(batting, 3)
+
+```
+
+
+## Subseting in dplyr
+
+**GOAL:** To take our joined data set and parse it to only years after 1919 and only players who had more than 199 at bats per season.\
+*The reasoning here is to eliminate the "dead ball era" while removing temporary minor leaguers and modern National League pitchers.*
+
+The `tidyr` package is a compliment to `dplyr` and provides additional data manipulation functions such as "spread" or "gather" data frames. In our case, we're using the `unite()` function to concatenate the players' first and last names.
+
+```{r}
+# Player name and team name appear next to playerID and teamID.
+batting <- subset(batting, yearID >= 1920 & AB >= 200,
+                  select = c("playerID", "nameFirst", "nameLast", "yearID", "stint", "teamID", "teamName", "lgID", "G", "AB", "R", "H", "X2B", "X3B", "HR", "BB", "HBP", "SF", "SH"))
+
+# Concatenate player names with unite() function from tidyr.
+library(tidyr)
+batting <- unite(batting, name, nameFirst, nameLast, sep=" ")
+
+# Base R equivalent:
+# batting <- subset(batting, yearID >= 1920 & AB >= 200)
+# batting <- batting[, c("playerID", "nameFirst", "nameLast", "yearID", "stint", "teamID", "teamName", "lgID", "G", "AB", "R", "H", "X2B", "X3B", "HR", "BB", "HBP", "SF", "SH")]
+# batting <- transform(batting, name = paste0(nameFirst, " ", nameLast))
+# batting <- batting[, c("playerID", "name", "yearID", "stint", "teamID", "teamName", "lgID", "G", "AB", "R", "H", "X2B", "X3B", "HR", "BB", "HBP", "SF", "SH")]
+
+head(batting, 3)
+```
+
+## Using pipes in R
+
+Pipes aren't native to R, many packages make use of the `magrittr` package, which adds a `%>%` operator as a pipe. The code block below accomplishes everything we have done with the Lahman data set above with fewer lines of code. Note, that only functions can be piped with the `magrittr` package.
+
+```{r}
+batting <- left_join(master, batting, by = "playerID") %>%
+    subset(yearID >= 1900 & AB >= 200,
+           select = c("playerID", "nameFirst", "nameLast", "yearID", "stint", "teamID",
+                      "lgID", "G", "AB", "R", "H", "X2B", "X3B", "HR", "BB", "HBP", "SF", "SH")) %>%
+    left_join(teams[,c("teamID", "yearID", "name")], by = c("teamID", "yearID")) %>%
+    unite(playerName, nameFirst, nameLast, sep=" ") %>% rename(teamName = name)
+
+# Base R equivalent:
+
+# batting <- merge(x = master, y = batting, by = "playerID", all.x = TRUE)
+# batting <- subset(batting, yearID >= 1920 & AB >= 200)
+# batting <- batting[, c("playerID", "nameFirst", "nameLast", "yearID", "stint", "teamID",
+#                      "lgID", "G", "AB", "R", "H", "X2B", "X3B", "HR", "BB", "HBP", "SF", "SH")]
+# batting <- transform(batting, name = paste0(nameFirst, " ", nameLast))
+# batting <- merge(x = master, y = batting, by = c("tea,ID", "yearID"), all.x = TRUE)
+
+head(batting, 3)
+```
+
+## Calculations and Mutation
+
+**GOAL:** Add two new columns to our data frame `BA` and `PA`, which calculate batting average and plate appearances. The first two lines of code are a base R solution, followed by two solutions using the `mutate()` function from the `dplyr` package.
+
+```{r}
+# This becomes a one-liner with the use of the mutate function and a pipe.
+batAVG <- batting %>% mutate(BA = H/AB)
+
+# Multimple calculations can be passed to one mutae command.
+battingStats <- batting %>% mutate(BA = H/AB, PA = AB+BB+HBP+SF+SH)
+
+# Base R equivalent:
+# batAVG <- batting
+# batAVG$BA <- batAVG$H / batAVG$AB
+# battingStats <- batAVG
+
+head(battingStats, 3)
+```
+
+## Grouping and Aggregating
+
+**GOAL:** The batting data frame is grouped by player and year. Find the total career home runs for every player in the data frame.
+
+Like joins, grouping and aggregating adhere to concepts found in SQL. The data frame is grouped by player and year, so we'll use the `group_by()` function to group by playerID only and then the `summarise()` function to find the sum of HR grouped by player.
+
+*If we did it right, we should see Barry Bonds and Hank Aaron at the top of the list.*
+
+```{r}
+batting <- Lahman::Batting
+# Grouped calculations
+moonShot <- batting %>% group_by(playerID) %>% 
+    summarise(careerHR = sum(HR)) %>%
+    arrange(desc(careerHR))
+
+# Base R equivalent:
+# moonShot <- batting
+# moonShot <- aggregate(moonShot$HR, by = list(moonShot$playerID), FUN=sum)
+# colnames(moonShot) <- c("playerID", "careerHR")
+# moonShot <- moonShot[order(-moonShot$careerHR),]
+
+head(moonShot, 3)
+```
+
+
+## Spreading Data with tidyr
+
+The `tidyr` package picks up where `dplyr` ends. Some of the most useful functions of the package are `spread()` and `gather()`, which allows us to recast our data frame in "wide" or "long" formats. The ability to switch data from wide to long formats can be helpful when preforming multiple analysis on a single data set.
+
+Set the batting table "wide" with a column for each year using the `spread()` function. This would be particularly helpful if plotting or visualizing the data.
+
+```{r}
+batting <- Lahman::Batting
+
+BattingLong <- batting %>% filter(yearID >= 2000) %>% group_by(playerID, yearID) %>% summarize(HR = sum(HR))
+
+BattingWide <- spread(BattingLong, key=yearID, value=HR)
+
+# names <- BattingLong$yearID
+# BattingWide <- as.data.frame(t(BattingLong[,-2]))
+# colnames(BattingWide) <- names
+# BattingWide$playerID <- factor(row.names(BattingWide))
+
+head(BattingWide, 3)
+```
+
+Use the `gather()` function to take the same data and cast it to "long" with two columns; a key and a value.
+
+```{r, warning=FALSE}
+BattingGathered <- gather(batting)
+head(BattingGathered, 10)
+```
+
+## Data Dictionary
+
+### Column definitions from the Lahman Database:
+
+* G = Games played
+
+* AB = At bats
+
+* R = Runs
+
+* H = Hits
+
+* X2B = Doubles
+
+* X3B = Triples
+
+* HR = Home Runs
+
+* BB = Walk / base on balls
+
+* HBP = Hit by pitch
+
+* SF = Sacrifice Fly
+
+* SH = Sacrifice Hit
+
+* Stint = How many times a player was a member of a team in one season. Example, if `Stint=2`, the player was traded to another team, then re-acquired by his first team in the same season.
