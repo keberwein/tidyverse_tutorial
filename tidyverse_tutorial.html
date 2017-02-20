@@ -230,7 +230,13 @@ div.tocify {
 <h3>Load the libraries we will need.</h3>
 <pre class="r"><code>library(Lahman)
 library(dplyr)
-library(tidyr)</code></pre>
+library(tidyr)
+library(magrittr)</code></pre>
+<pre><code>## 
+## Attaching package: 'magrittr'</code></pre>
+<pre><code>## The following object is masked from 'package:tidyr':
+## 
+##     extract</code></pre>
 </div>
 <div id="loading-data" class="section level2">
 <h2>Loading Data</h2>
@@ -266,7 +272,7 @@ battingPlayer &lt;- left_join(master, batting, by = &quot;playerID&quot;)
 # Base R equivalent:
 # master &lt;- master[, c(&quot;playerID&quot;, &quot;nameFirst&quot;, &quot;nameLast&quot;)]
 # battingPlayer &lt;- merge(x = master, y = batting, by = &quot;playerID&quot;, all.x = TRUE)</code></pre>
-<p>We can use the same strategy as above to add full team names to the data set. <strong>Notw</strong> the use of the <code>rename()</code> function to rename the ambiguous column “name” to “teamName.”</p>
+<p>We can use the same strategy as above to add full team names to the data set. <strong>Note</strong> the use of the <code>rename()</code> function to rename the ambiguous column “name” to “teamName.”</p>
 <pre class="r"><code>teamsYr &lt;- select(teams, teamID, yearID, name)
 # Rename the team name column to avoid confusion
 teamsYr &lt;- rename(teamsYr, &quot;teamName&quot; = name)
@@ -343,22 +349,26 @@ head(batting, 3)</code></pre>
 ## 1 28   3  4  6 Milwaukee Braves
 ## 2 49   3  4  7 Milwaukee Braves
 ## 3 37   2  7  5 Milwaukee Braves</code></pre>
+<p>The foward pipe operator is exported by <code>dplyr</code>, <code>tidyr</code>, and several over R packages. However, the <code>magrittr</code> package, which is the basis for the pipe, provides additional operations. For example, with the <code>%&lt;&gt;%</code> operator, we can make a data frame the source <em>and</em> the target of a transformation. For example, the following statements acomplish the same task.</p>
+<pre class="r"><code>batting &lt;- subset(batting, yearID &gt;= 1900)
+
+# ...is the same as
+batting %&lt;&gt;% subset(yearID &gt;= 1900)</code></pre>
 </div>
 <div id="calculations-and-mutation" class="section level2">
 <h2>Calculations and Mutation</h2>
 <p><strong>GOAL:</strong> Add two new columns to our data frame <code>BA</code> and <code>PA</code>, which calculate batting average and plate appearances. The first two lines of code are a base R solution, followed by two solutions using the <code>mutate()</code> function from the <code>dplyr</code> package.</p>
 <pre class="r"><code># This becomes a one-liner with the use of the mutate function and a pipe.
-batAVG &lt;- batting %&gt;% mutate(BA = H/AB)
+batting %&lt;&gt;% mutate(BA = H/AB)
 
 # Multimple calculations can be passed to one mutae command.
-battingStats &lt;- batting %&gt;% mutate(BA = H/AB, PA = AB+BB+HBP+SF+SH)
+batting %&lt;&gt;% mutate(BA = H/AB, PA = AB+BB+HBP+SF+SH)
 
 # Base R equivalent:
-# batAVG &lt;- batting
-# batAVG$BA &lt;- batAVG$H / batAVG$AB
-# battingStats &lt;- batAVG
+# batting$BA &lt;- batting$H / batting$AB
+# batting$PA &lt;- AB + BB + HBP + SF + SH
 
-head(battingStats, 3)</code></pre>
+head(batting, 3)</code></pre>
 <pre><code>##    playerID playerName yearID stint teamID lgID   G  AB   R   H X2B X3B HR
 ## 1 aaronha01 Hank Aaron   1954     1    ML1   NL 122 468  58 131  27   6 13
 ## 2 aaronha01 Hank Aaron   1955     1    ML1   NL 153 602 105 189  37   9 27

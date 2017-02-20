@@ -26,6 +26,7 @@ This walk-through provides a brief introduction to the `dplyr` and `tidyr` packa
 library(Lahman)
 library(dplyr)
 library(tidyr)
+library(magrittr)
 ```
 
 ## Loading Data
@@ -68,7 +69,7 @@ battingPlayer <- left_join(master, batting, by = "playerID")
 
 ```
 
-We can use the same strategy as above to add full team names to the data set. **Notw** the use of the `rename()` function to rename the ambiguous column "name" to "teamName."
+We can use the same strategy as above to add full team names to the data set. **Note** the use of the `rename()` function to rename the ambiguous column "name" to "teamName."
 
 ```{r}
 teamsYr <- select(teams, teamID, yearID, name)
@@ -134,23 +135,33 @@ batting <- left_join(master, batting, by = "playerID") %>%
 head(batting, 3)
 ```
 
+The foward pipe operator is exported by `dplyr`, `tidyr`, and several over R packages. However, the `magrittr` package, which is the basis for the pipe, provides additional operations. For example, with the `%<>%` operator, we can make a data frame the source *and* the target of a transformation. For example, the following statements acomplish the same task.
+
+```{r}
+batting <- subset(batting, yearID >= 1900)
+
+# ...is the same as
+batting %<>% subset(yearID >= 1900)
+
+```
+
+
 ## Calculations and Mutation
 
 **GOAL:** Add two new columns to our data frame `BA` and `PA`, which calculate batting average and plate appearances. The first two lines of code are a base R solution, followed by two solutions using the `mutate()` function from the `dplyr` package.
 
 ```{r}
 # This becomes a one-liner with the use of the mutate function and a pipe.
-batAVG <- batting %>% mutate(BA = H/AB)
+batting %<>% mutate(BA = H/AB)
 
 # Multimple calculations can be passed to one mutae command.
-battingStats <- batting %>% mutate(BA = H/AB, PA = AB+BB+HBP+SF+SH)
+batting %<>% mutate(BA = H/AB, PA = AB+BB+HBP+SF+SH)
 
 # Base R equivalent:
-# batAVG <- batting
-# batAVG$BA <- batAVG$H / batAVG$AB
-# battingStats <- batAVG
+# batting$BA <- batting$H / batting$AB
+# batting$PA <- AB + BB + HBP + SF + SH
 
-head(battingStats, 3)
+head(batting, 3)
 ```
 
 ## Grouping and Aggregating
