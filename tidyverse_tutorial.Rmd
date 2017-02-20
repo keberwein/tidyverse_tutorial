@@ -39,9 +39,6 @@ batting <- Lahman::Batting
 # Take a look at the first few rows of the data set.
 head(Batting, 3)
 
-# Get Player names and Teams names from other tables
-teams <- Lahman::Teams
-master <- Lahman::Master
 ```
 
 ## Manipulating Data with dplyr
@@ -49,6 +46,12 @@ master <- Lahman::Master
 **GOAL:** Add full player names from the `master` data frame to the `batting` data frame.
 
 The dplyr package has several "join" functions, many of which are similar, in concept, to SQL joins. Full descriptions of dplyr joins can be [found here](http://stat545.com/bit001_dplyr-cheatsheet.html). For our use, a left join is the most appropriate.
+
+```{r}
+# Get Player names and Teams names from other tables
+teams <- Lahman::Teams
+master <- Lahman::Master
+```
 
 
 ```{r}
