@@ -248,14 +248,14 @@ head(Batting, 3)</code></pre>
 ## 1  0  NA  NA NA NA   NA
 ## 2  0  NA  NA NA NA   NA
 ## 3  5  NA  NA NA NA   NA</code></pre>
-<pre class="r"><code># Get Player names and Teams names from other tables
-teams &lt;- Lahman::Teams
-master &lt;- Lahman::Master</code></pre>
 </div>
 <div id="manipulating-data-with-dplyr" class="section level2">
 <h2>Manipulating Data with dplyr</h2>
 <p><strong>GOAL:</strong> Add full player names from the <code>master</code> data frame to the <code>batting</code> data frame.</p>
 <p>The dplyr package has several “join” functions, many of which are similar, in concept, to SQL joins. Full descriptions of dplyr joins can be <a href="http://stat545.com/bit001_dplyr-cheatsheet.html">found here</a>. For our use, a left join is the most appropriate.</p>
+<pre class="r"><code># Get Player names and Teams names from other tables
+teams &lt;- Lahman::Teams
+master &lt;- Lahman::Master</code></pre>
 <pre class="r"><code>library(dplyr)
 # Subset master table to only playerID and player names since that's all we need.
 master &lt;- select(master, playerID, nameFirst, nameLast)
