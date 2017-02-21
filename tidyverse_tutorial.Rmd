@@ -217,6 +217,29 @@ BattingGathered <- gather(batting)
 head(BattingGathered, 10)
 ```
 
+## Visualization
+
+The default visualization in the R language is the `plot()` function from base R. However, the `ggplot2` package has become somewhat of a defacto standard.
+
+**GOAL:** Subset the Batting table from the Lahman data base to the total number of Runs scored by the entire leauge, grouped by year, and perform an analysis of how runs scored may be releated to batting average.
+
+```{r}
+batting <- Lahman::Batting
+
+# Subset for players who had at least one at-bat, group by year, aggregate, and calculate a league batting average.
+batting %<>% subset(AB >= 1) %>% group_by(yearID) %>% 
+    summarise(H = sum(H), AB = sum(AB), R = sum(R)) %>% mutate(BA = H/AB)
+```
+
+The `ggplot2` package can has tons of options, which can be overwhelming at first. However, it is quite simple in basic usage. **Note:** The `+` operator in this package acts the same as the standard pipe operator `%>%` from the `magrittr` package.
+
+```{r}
+library(ggplot2)
+ggplot(batting, aes(BA, R)) + 
+    geom_point(aes(colour = yearID))
+```
+
+
 ## Data Dictionary
 
 ### Column definitions from the Lahman Database:
