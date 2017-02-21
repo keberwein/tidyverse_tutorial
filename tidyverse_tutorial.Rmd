@@ -239,7 +239,7 @@ ggplot(batting, aes(BA, R)) +
     geom_point(aes(colour = yearID))
 ```
 
-We can see by the plot that there is no apparent relationship between batting average and runs scored. However, there seems to be a sample bias based on time period. More recent years have higher runs scored with lower batting averages, while the early to mid 1900's show higher batting averages and lower runs scored. This behavior suggests we should block our sample by time period or run scoring environment.
+We can see by the plot that there is no apparent relationship between batting average and runs scored. However, there seems to be a sample bias based on time period, meaning batting average and runs may not be disjoint events. This behavior suggests we should block our sample by time period in order to isolate the different run scoring environments.
 
 ## Data Dictionary
 
