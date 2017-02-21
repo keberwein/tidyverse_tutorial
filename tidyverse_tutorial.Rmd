@@ -135,7 +135,7 @@ batting <- left_join(master, batting, by = "playerID") %>%
 head(batting, 3)
 ```
 
-The foward pipe operator is exported by `dplyr`, `tidyr`, and several over R packages. However, the `magrittr` package, which is the basis for the pipe, provides additional operations. For example, with the `%<>%` operator, we can make a data frame the source *and* the target of a transformation. For example, the following statements acomplish the same task.
+The forward pipe operator is exported by `dplyr`, `tidyr`, and several over R packages. However, the `magrittr` package, which is the basis for the pipe, provides additional operations. For example, with the `%<>%` operator, we can make a data frame the source *and* the target of a transformation. For example, the following statements accomplish the same task.
 
 ```{r}
 batting <- subset(batting, yearID >= 1900)
@@ -221,7 +221,7 @@ head(BattingGathered, 10)
 
 The default visualization in the R language is the `plot()` function from base R. However, the `ggplot2` package has become somewhat of a defacto standard.
 
-**GOAL:** Subset the Batting table from the Lahman data base to the total number of Runs scored by the entire leauge, grouped by year, and perform an analysis of how runs scored may be releated to batting average.
+**GOAL:** Subset the Batting table from the Lahman data base to the total number of Runs scored by the entire league, grouped by year, and perform an analysis of how runs scored may be related to batting average.
 
 ```{r}
 batting <- Lahman::Batting
@@ -239,6 +239,7 @@ ggplot(batting, aes(BA, R)) +
     geom_point(aes(colour = yearID))
 ```
 
+We can see by the plot that there is no apparent relationship between batting average and runs scored. However, there seems to be a sample bias based on time period. More recent years have higher runs scored with lower batting averages, while the early to mid 1900's show higher batting averages and lower runs scored. This behavior suggests we should block our sample by time period or run scoring environment.
 
 ## Data Dictionary
 
