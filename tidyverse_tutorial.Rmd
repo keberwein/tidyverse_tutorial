@@ -9,10 +9,9 @@ output:
     theme: united
 ---
 ```{r setup, include=FALSE, warning=FALSE}
-#knitr::opts_chunk$set(echo = FALSE)
-pkgs <-c('Lahman','dplyr', 'tidyr')
+# Make sure all the required packages are installed on the system.
+pkgs <-c('Lahman','dplyr', 'tidyr', 'magrittr')
 for(p in pkgs) if(p %in% rownames(installed.packages()) == FALSE) {install.packages(p, repos='http://cran.us.r-project.org')}
-for(p in pkgs) suppressPackageStartupMessages(library(p, quietly=TRUE, character.only=TRUE))
 options("getSymbols.warning4.0"=FALSE)
 ```
 
