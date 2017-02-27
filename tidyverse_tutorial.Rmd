@@ -15,7 +15,7 @@ for(p in pkgs) if(p %in% rownames(installed.packages()) == FALSE) {install.packa
 options("getSymbols.warning4.0"=FALSE)
 ```
 
-### Introduction
+## Introduction
 
 This walk-through provides a brief introduction to the `dplyr` and `tidyr` packages in R that allow us to reshape our data for visualization or analysis. We will analyse Major League Baseball data from the `Lahaman` package. For convenience, the “base R” equivalents to the `dplyr` and `tidy` functions at bottom of each code block.
 
