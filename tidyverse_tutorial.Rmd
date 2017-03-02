@@ -21,7 +21,7 @@ This walk-through provides a brief introduction to the `dplyr` and `tidyr` packa
 
 ### Load the libraries we will need.
 
-```{r}
+```{r, message=FALSE}
 library(Lahman)
 library(dplyr)
 library(tidyr)
