@@ -87,7 +87,7 @@ head(batting, 3)
 
 ## Subseting in dplyr
 
-**GOAL:** To take our joined data set and parse it to only years after 1919 and only players who had more than 199 at bats per season.\
+**GOAL:** To take our joined data set and parse it to only years after 1919 and only players who had more than 199 at bats per season.
 *The reasoning here is to eliminate the "dead ball era" while removing temporary minor leaguers and modern National League pitchers.*
 
 The `tidyr` package is a compliment to `dplyr` and provides additional data manipulation functions such as "spread" or "gather" data frames. In our case, we're using the `unite()` function to concatenate the players' first and last names.
@@ -99,7 +99,7 @@ batting <- subset(batting, yearID >= 1920 & AB >= 200,
 
 # Concatenate player names with unite() function from tidyr.
 library(tidyr)
-batting <- unite(batting, name, nameFirst, nameLast, sep=" ")
+batting <- unite(batting, playerName, nameFirst, nameLast, sep=" ")
 
 # Base R equivalent:
 # batting <- subset(batting, yearID >= 1920 & AB >= 200)
@@ -116,7 +116,7 @@ Pipes aren't native to R, many packages make use of the `magrittr` package, whic
 
 ```{r}
 batting <- left_join(master, batting, by = "playerID") %>%
-    subset(yearID >= 1900 & AB >= 200,
+    subset(yearID >= 1920 & AB >= 200,
            select = c("playerID", "nameFirst", "nameLast", "yearID", "stint", "teamID",
                       "lgID", "G", "AB", "R", "H", "X2B", "X3B", "HR", "BB", "HBP", "SF", "SH")) %>%
     left_join(teams[,c("teamID", "yearID", "name")], by = c("teamID", "yearID")) %>%
@@ -158,7 +158,7 @@ batting %<>% mutate(BA = H/AB, PA = AB+BB+HBP+SF+SH)
 
 # Base R equivalent:
 # batting$BA <- batting$H / batting$AB
-# batting$PA <- AB + BB + HBP + SF + SH
+# batting$PA <- batting$AB + batting$BB + batting$HBP + batting$SF + batting$SH
 
 head(batting, 3)
 ```
@@ -197,7 +197,7 @@ Set the batting table "wide" with a column for each year using the `spread()` fu
 ```{r}
 batting <- Lahman::Batting
 
-BattingLong <- batting %>% filter(yearID >= 2000) %>% group_by(playerID, yearID) %>% summarize(HR = sum(HR))
+BattingLong <- batting %>% filter(yearID >= 2000 & AB >=200) %>% group_by(playerID, yearID) %>% summarize(HR = sum(HR))
 
 BattingWide <- spread(BattingLong, key=yearID, value=HR)
 
@@ -226,7 +226,7 @@ The default visualization in the R language is the `plot()` function from base R
 batting <- Lahman::Batting
 
 # Subset for players who had at least one at-bat, group by year, aggregate, and calculate a league batting average.
-batting %<>% subset(AB >= 1) %>% group_by(yearID) %>% 
+batting %<>% subset(AB >= 200 & yearID >= 1920) %>% group_by(yearID, playerID) %>% 
     summarise(H = sum(H), AB = sum(AB), R = sum(R)) %>% mutate(BA = H/AB)
 ```
 
@@ -238,7 +238,7 @@ ggplot(batting, aes(BA, R)) +
     geom_point(aes(colour = yearID))
 ```
 
-We can see by the plot that there is no apparent relationship between batting average and runs scored. However, there seems to be a sample bias based on time period, meaning batting average and runs may not be disjoint events. This behavior suggests we should block our sample by time period in order to isolate the different run scoring environments.
+We can see by the plot that there seems to be a relationship between batting average and runs scored.
 
 ## Data Dictionary
 
