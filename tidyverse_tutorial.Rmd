@@ -94,8 +94,7 @@ The `tidyr` package is a compliment to `dplyr` and provides additional data mani
 
 ```{r}
 # Player name and team name appear next to playerID and teamID.
-batting <- subset(batting, yearID >= 1920 & AB >= 200,
-                  select = c("playerID", "nameFirst", "nameLast", "yearID", "stint", "teamID", "teamName", "lgID", "G", "AB", "R", "H", "X2B", "X3B", "HR", "BB", "HBP", "SF", "SH"))
+batting <- subset(batting, yearID >= 1955 & AB >= 200)
 
 # Concatenate player names with unite() function from tidyr.
 library(tidyr)
@@ -103,9 +102,8 @@ batting <- unite(batting, playerName, nameFirst, nameLast, sep=" ")
 
 # Base R equivalent:
 # batting <- subset(batting, yearID >= 1920 & AB >= 200)
-# batting <- batting[, c("playerID", "nameFirst", "nameLast", "yearID", "stint", "teamID", "teamName", "lgID", "G", "AB", "R", "H", "X2B", "X3B", "HR", "BB", "HBP", "SF", "SH")]
-# batting <- transform(batting, name = paste0(nameFirst, " ", nameLast))
-# batting <- batting[, c("playerID", "name", "yearID", "stint", "teamID", "teamName", "lgID", "G", "AB", "R", "H", "X2B", "X3B", "HR", "BB", "HBP", "SF", "SH")]
+# batting <- transform(batting, playerName = paste0(nameFirst, " ", nameLast))
+# batting <- batting[, c("playerID", "playerName", "yearID", "stint", "teamID", "teamName", "lgID", "G", "AB", "R", "H", "X2B", "X3B", "HR", "BB", "HBP", "SF", "SH")]
 
 head(batting, 3)
 ```
@@ -115,22 +113,21 @@ head(batting, 3)
 Pipes aren't native to R, many packages make use of the `magrittr` package, which adds a `%>%` operator as a pipe. The code block below accomplishes everything we have done with the Lahman data set above with fewer lines of code. Note, that only functions can be piped with the `magrittr` package.
 
 ```{r}
-batting <- left_join(master, batting, by = "playerID") %>%
-    subset(yearID >= 1920 & AB >= 200,
-           select = c("playerID", "nameFirst", "nameLast", "yearID", "stint", "teamID",
-                      "lgID", "G", "AB", "R", "H", "X2B", "X3B", "HR", "BB", "HBP", "SF", "SH")) %>%
+batting <- Lahman::Batting
+batting <- left_join(batting, master, by = "playerID") %>%
+    subset(yearID >= 1955 & AB >= 200) %>%
     left_join(teams[,c("teamID", "yearID", "name")], by = c("teamID", "yearID")) %>%
-    unite(playerName, nameFirst, nameLast, sep=" ") %>% 
-    rename(teamName = name)
+    unite(playerName, nameFirst, nameLast, sep=" ") %>% rename(teamName = name)
 
 # Base R equivalent:
-
+# batting <- Lahmand::Batting
 # batting <- merge(x = master, y = batting, by = "playerID", all.x = TRUE)
-# batting <- subset(batting, yearID >= 1920 & AB >= 200)
-# batting <- batting[, c("playerID", "nameFirst", "nameLast", "yearID", "stint", "teamID",
-#                      "lgID", "G", "AB", "R", "H", "X2B", "X3B", "HR", "BB", "HBP", "SF", "SH")]
+# batting <- subset(batting, yearID >= 1955 & AB >= 200)
 # batting <- transform(batting, name = paste0(nameFirst, " ", nameLast))
 # batting <- merge(x = master, y = batting, by = c("tea,ID", "yearID"), all.x = TRUE)
+# colnames(batting) <- c("playerID", "yearID", "stint", "teamID", "lgID", "G", "AB", "R",
+# "H", "X2B", "X3B", "HR", "RBI", "SB", "CS", "BB", "SO", "IBB", "HBP", "SH", "SF", "GIDP", "playerName",
+# "teamName")
 
 head(batting, 3)
 ```
@@ -155,7 +152,8 @@ batting %<>% subset(yearID >= 1900)
 batting %<>% mutate(BA = H/AB)
 
 # Multimple calculations can be passed to one mutae command.
-batting %<>% mutate(BA = H/AB, PA = AB+BB+HBP+SF+SH)
+batting %<>% mutate(BA = H/AB, 
+                    OBP = (H + BB + IBB + HBP) / (AB + BB + IBB + HBP + SF + SH ))
 
 # Base R equivalent:
 # batting$BA <- batting$H / batting$AB
@@ -176,8 +174,7 @@ Like joins, grouping and aggregating adhere to concepts found in SQL. The data f
 batting <- Lahman::Batting
 # Grouped calculations
 moonShot <- batting %>% group_by(playerID) %>% 
-    summarise(careerHR = sum(HR)) %>%
-    arrange(desc(careerHR))
+    summarise(careerHR = sum(HR)) %>% arrange(desc(careerHR))
 
 # Base R equivalent:
 # moonShot <- batting
@@ -198,7 +195,8 @@ Set the batting table "wide" with a column for each year using the `spread()` fu
 ```{r}
 batting <- Lahman::Batting
 
-BattingLong <- batting %>% filter(yearID >= 2000 & AB >=200) %>% group_by(playerID, yearID) %>% summarize(HR = sum(HR))
+BattingLong <- batting %>% filter(yearID >= 2000 & AB >=200) %>% group_by(playerID, yearID) %>% 
+    summarize(HR = sum(HR))
 
 BattingWide <- spread(BattingLong, key=yearID, value=HR)
 

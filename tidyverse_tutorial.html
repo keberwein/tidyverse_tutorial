@@ -292,8 +292,7 @@ head(batting, 3)</code></pre>
 <p><strong>GOAL:</strong> To take our joined data set and parse it to only years after 1919 and only players who had more than 199 at bats per season. <em>The reasoning here is to eliminate the “dead ball era” while removing temporary minor leaguers and modern National League pitchers.</em></p>
 <p>The <code>tidyr</code> package is a compliment to <code>dplyr</code> and provides additional data manipulation functions such as “spread” or “gather” data frames. In our case, we’re using the <code>unite()</code> function to concatenate the players’ first and last names.</p>
 <pre class="r"><code># Player name and team name appear next to playerID and teamID.
-batting &lt;- subset(batting, yearID &gt;= 1920 &amp; AB &gt;= 200,
-                  select = c(&quot;playerID&quot;, &quot;nameFirst&quot;, &quot;nameLast&quot;, &quot;yearID&quot;, &quot;stint&quot;, &quot;teamID&quot;, &quot;teamName&quot;, &quot;lgID&quot;, &quot;G&quot;, &quot;AB&quot;, &quot;R&quot;, &quot;H&quot;, &quot;X2B&quot;, &quot;X3B&quot;, &quot;HR&quot;, &quot;BB&quot;, &quot;HBP&quot;, &quot;SF&quot;, &quot;SH&quot;))
+batting &lt;- subset(batting, yearID &gt;= 1955 &amp; AB &gt;= 200)
 
 # Concatenate player names with unite() function from tidyr.
 library(tidyr)
@@ -301,49 +300,47 @@ batting &lt;- unite(batting, playerName, nameFirst, nameLast, sep=&quot; &quot;)
 
 # Base R equivalent:
 # batting &lt;- subset(batting, yearID &gt;= 1920 &amp; AB &gt;= 200)
-# batting &lt;- batting[, c(&quot;playerID&quot;, &quot;nameFirst&quot;, &quot;nameLast&quot;, &quot;yearID&quot;, &quot;stint&quot;, &quot;teamID&quot;, &quot;teamName&quot;, &quot;lgID&quot;, &quot;G&quot;, &quot;AB&quot;, &quot;R&quot;, &quot;H&quot;, &quot;X2B&quot;, &quot;X3B&quot;, &quot;HR&quot;, &quot;BB&quot;, &quot;HBP&quot;, &quot;SF&quot;, &quot;SH&quot;)]
-# batting &lt;- transform(batting, name = paste0(nameFirst, &quot; &quot;, nameLast))
-# batting &lt;- batting[, c(&quot;playerID&quot;, &quot;name&quot;, &quot;yearID&quot;, &quot;stint&quot;, &quot;teamID&quot;, &quot;teamName&quot;, &quot;lgID&quot;, &quot;G&quot;, &quot;AB&quot;, &quot;R&quot;, &quot;H&quot;, &quot;X2B&quot;, &quot;X3B&quot;, &quot;HR&quot;, &quot;BB&quot;, &quot;HBP&quot;, &quot;SF&quot;, &quot;SH&quot;)]
+# batting &lt;- transform(batting, playerName = paste0(nameFirst, &quot; &quot;, nameLast))
+# batting &lt;- batting[, c(&quot;playerID&quot;, &quot;playerName&quot;, &quot;yearID&quot;, &quot;stint&quot;, &quot;teamID&quot;, &quot;teamName&quot;, &quot;lgID&quot;, &quot;G&quot;, &quot;AB&quot;, &quot;R&quot;, &quot;H&quot;, &quot;X2B&quot;, &quot;X3B&quot;, &quot;HR&quot;, &quot;BB&quot;, &quot;HBP&quot;, &quot;SF&quot;, &quot;SH&quot;)]
 
 head(batting, 3)</code></pre>
-<pre><code>##        playerID    playerName yearID stint teamID         teamName lgID
-## 18143 austiji01  Jimmy Austin   1920     1    SLA St. Louis Browns   AL
-## 18152 bancrda01 Dave Bancroft   1920     2    NY1  New York Giants   NL
-## 18154 barbetu01 Turner Barber   1920     1    CHN     Chicago Cubs   NL
-##         G  AB  R   H X2B X3B HR BB HBP SF SH
-## 18143  83 280 38  76  11   3  1 31   4 NA 15
-## 18152 108 442 79 132  29   7  0 33   1 NA 12
-## 18154  94 340 27  90  10   5  0  9   3 NA 17</code></pre>
+<pre><code>##        playerID yearID stint teamID lgID   G  AB   R   H X2B X3B HR RBI SB
+## 37448 aaronha01   1955     1    ML1   NL 153 602 105 189  37   9 27 106  3
+## 37451 abramca01   1955     1    BAL   AL 118 309  56  75  12   3  6  32  2
+## 37454 adcocjo01   1955     1    ML1   NL  84 288  40  76  14   0 15  45  0
+##       CS BB SO IBB HBP SH SF GIDP playerName          teamName
+## 37448  1 49 61   5   3  7  4   20 Hank Aaron  Milwaukee Braves
+## 37451  8 89 69   2   3  3  3    6 Cal Abrams Baltimore Orioles
+## 37454  2 31 44   3   2  2  1   13 Joe Adcock  Milwaukee Braves</code></pre>
 </div>
 <div id="using-pipes-in-r" class="section level2">
 <h2>Using pipes in R</h2>
 <p>Pipes aren’t native to R, many packages make use of the <code>magrittr</code> package, which adds a <code>%&gt;%</code> operator as a pipe. The code block below accomplishes everything we have done with the Lahman data set above with fewer lines of code. Note, that only functions can be piped with the <code>magrittr</code> package.</p>
-<pre class="r"><code>batting &lt;- left_join(master, batting, by = &quot;playerID&quot;) %&gt;%
-    subset(yearID &gt;= 1920 &amp; AB &gt;= 200,
-           select = c(&quot;playerID&quot;, &quot;nameFirst&quot;, &quot;nameLast&quot;, &quot;yearID&quot;, &quot;stint&quot;, &quot;teamID&quot;,
-                      &quot;lgID&quot;, &quot;G&quot;, &quot;AB&quot;, &quot;R&quot;, &quot;H&quot;, &quot;X2B&quot;, &quot;X3B&quot;, &quot;HR&quot;, &quot;BB&quot;, &quot;HBP&quot;, &quot;SF&quot;, &quot;SH&quot;)) %&gt;%
+<pre class="r"><code>batting &lt;- Lahman::Batting
+batting &lt;- left_join(batting, master, by = &quot;playerID&quot;) %&gt;%
+    subset(yearID &gt;= 1955 &amp; AB &gt;= 200) %&gt;%
     left_join(teams[,c(&quot;teamID&quot;, &quot;yearID&quot;, &quot;name&quot;)], by = c(&quot;teamID&quot;, &quot;yearID&quot;)) %&gt;%
-    unite(playerName, nameFirst, nameLast, sep=&quot; &quot;) %&gt;% 
-    rename(teamName = name)
+    unite(playerName, nameFirst, nameLast, sep=&quot; &quot;) %&gt;% rename(teamName = name)
 
 # Base R equivalent:
-
+# batting &lt;- Lahmand::Batting
 # batting &lt;- merge(x = master, y = batting, by = &quot;playerID&quot;, all.x = TRUE)
-# batting &lt;- subset(batting, yearID &gt;= 1920 &amp; AB &gt;= 200)
-# batting &lt;- batting[, c(&quot;playerID&quot;, &quot;nameFirst&quot;, &quot;nameLast&quot;, &quot;yearID&quot;, &quot;stint&quot;, &quot;teamID&quot;,
-#                      &quot;lgID&quot;, &quot;G&quot;, &quot;AB&quot;, &quot;R&quot;, &quot;H&quot;, &quot;X2B&quot;, &quot;X3B&quot;, &quot;HR&quot;, &quot;BB&quot;, &quot;HBP&quot;, &quot;SF&quot;, &quot;SH&quot;)]
+# batting &lt;- subset(batting, yearID &gt;= 1955 &amp; AB &gt;= 200)
 # batting &lt;- transform(batting, name = paste0(nameFirst, &quot; &quot;, nameLast))
 # batting &lt;- merge(x = master, y = batting, by = c(&quot;tea,ID&quot;, &quot;yearID&quot;), all.x = TRUE)
+# colnames(batting) &lt;- c(&quot;playerID&quot;, &quot;yearID&quot;, &quot;stint&quot;, &quot;teamID&quot;, &quot;lgID&quot;, &quot;G&quot;, &quot;AB&quot;, &quot;R&quot;,
+# &quot;H&quot;, &quot;X2B&quot;, &quot;X3B&quot;, &quot;HR&quot;, &quot;RBI&quot;, &quot;SB&quot;, &quot;CS&quot;, &quot;BB&quot;, &quot;SO&quot;, &quot;IBB&quot;, &quot;HBP&quot;, &quot;SH&quot;, &quot;SF&quot;, &quot;GIDP&quot;, &quot;playerName&quot;,
+# &quot;teamName&quot;)
 
 head(batting, 3)</code></pre>
-<pre><code>##    playerID playerName yearID stint teamID lgID   G  AB   R   H X2B X3B HR
-## 1 aaronha01 Hank Aaron   1954     1    ML1   NL 122 468  58 131  27   6 13
-## 2 aaronha01 Hank Aaron   1955     1    ML1   NL 153 602 105 189  37   9 27
-## 3 aaronha01 Hank Aaron   1956     1    ML1   NL 153 609 106 200  34  14 26
-##   BB HBP SF SH         teamName
-## 1 28   3  4  6 Milwaukee Braves
-## 2 49   3  4  7 Milwaukee Braves
-## 3 37   2  7  5 Milwaukee Braves</code></pre>
+<pre><code>##    playerID yearID stint teamID lgID   G  AB   R   H X2B X3B HR RBI SB CS
+## 1 aaronha01   1955     1    ML1   NL 153 602 105 189  37   9 27 106  3  1
+## 2 abramca01   1955     1    BAL   AL 118 309  56  75  12   3  6  32  2  8
+## 3 adcocjo01   1955     1    ML1   NL  84 288  40  76  14   0 15  45  0  2
+##   BB SO IBB HBP SH SF GIDP playerName          teamName
+## 1 49 61   5   3  7  4   20 Hank Aaron  Milwaukee Braves
+## 2 89 69   2   3  3  3    6 Cal Abrams Baltimore Orioles
+## 3 31 44   3   2  2  1   13 Joe Adcock  Milwaukee Braves</code></pre>
 <p>The forward pipe operator is exported by <code>dplyr</code>, <code>tidyr</code>, and several over R packages. However, the <code>magrittr</code> package, which is the basis for the pipe, provides additional operations. For example, with the <code>%&lt;&gt;%</code> operator, we can make a data frame the source <em>and</em> the target of a transformation. For example, the following statements accomplish the same task.</p>
 <pre class="r"><code>batting &lt;- subset(batting, yearID &gt;= 1900)
 
@@ -357,21 +354,26 @@ batting %&lt;&gt;% subset(yearID &gt;= 1900)</code></pre>
 batting %&lt;&gt;% mutate(BA = H/AB)
 
 # Multimple calculations can be passed to one mutae command.
-batting %&lt;&gt;% mutate(BA = H/AB, PA = AB+BB+HBP+SF+SH)
+batting %&lt;&gt;% mutate(BA = H/AB, 
+                    OBP = (H + BB + IBB + HBP) / (AB + BB + IBB + HBP + SF + SH ))
 
 # Base R equivalent:
 # batting$BA &lt;- batting$H / batting$AB
 # batting$PA &lt;- batting$AB + batting$BB + batting$HBP + batting$SF + batting$SH
 
 head(batting, 3)</code></pre>
-<pre><code>##    playerID playerName yearID stint teamID lgID   G  AB   R   H X2B X3B HR
-## 1 aaronha01 Hank Aaron   1954     1    ML1   NL 122 468  58 131  27   6 13
-## 2 aaronha01 Hank Aaron   1955     1    ML1   NL 153 602 105 189  37   9 27
-## 3 aaronha01 Hank Aaron   1956     1    ML1   NL 153 609 106 200  34  14 26
-##   BB HBP SF SH         teamName        BA  PA
-## 1 28   3  4  6 Milwaukee Braves 0.2799145 509
-## 2 49   3  4  7 Milwaukee Braves 0.3139535 665
-## 3 37   2  7  5 Milwaukee Braves 0.3284072 660</code></pre>
+<pre><code>##    playerID yearID stint teamID lgID   G  AB   R   H X2B X3B HR RBI SB CS
+## 1 aaronha01   1955     1    ML1   NL 153 602 105 189  37   9 27 106  3  1
+## 2 abramca01   1955     1    BAL   AL 118 309  56  75  12   3  6  32  2  8
+## 3 adcocjo01   1955     1    ML1   NL  84 288  40  76  14   0 15  45  0  2
+##   BB SO IBB HBP SH SF GIDP playerName          teamName        BA
+## 1 49 61   5   3  7  4   20 Hank Aaron  Milwaukee Braves 0.3139535
+## 2 89 69   2   3  3  3    6 Cal Abrams Baltimore Orioles 0.2427184
+## 3 31 44   3   2  2  1   13 Joe Adcock  Milwaukee Braves 0.2638889
+##         OBP
+## 1 0.3671642
+## 2 0.4132029
+## 3 0.3425076</code></pre>
 </div>
 <div id="grouping-and-aggregating" class="section level2">
 <h2>Grouping and Aggregating</h2>
@@ -381,8 +383,7 @@ head(batting, 3)</code></pre>
 <pre class="r"><code>batting &lt;- Lahman::Batting
 # Grouped calculations
 moonShot &lt;- batting %&gt;% group_by(playerID) %&gt;% 
-    summarise(careerHR = sum(HR)) %&gt;%
-    arrange(desc(careerHR))
+    summarise(careerHR = sum(HR)) %&gt;% arrange(desc(careerHR))
 
 # Base R equivalent:
 # moonShot &lt;- batting
@@ -404,7 +405,8 @@ head(moonShot, 3)</code></pre>
 <p>Set the batting table “wide” with a column for each year using the <code>spread()</code> function. This would be particularly helpful if plotting or visualizing the data.</p>
 <pre class="r"><code>batting &lt;- Lahman::Batting
 
-BattingLong &lt;- batting %&gt;% filter(yearID &gt;= 2000 &amp; AB &gt;=200) %&gt;% group_by(playerID, yearID) %&gt;% summarize(HR = sum(HR))
+BattingLong &lt;- batting %&gt;% filter(yearID &gt;= 2000 &amp; AB &gt;=200) %&gt;% group_by(playerID, yearID) %&gt;% 
+    summarize(HR = sum(HR))
 
 BattingWide &lt;- spread(BattingLong, key=yearID, value=HR)
 
