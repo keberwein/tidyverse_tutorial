@@ -60,7 +60,7 @@ library(dplyr)
 master <- select(master, playerID, nameFirst, nameLast)
 
 # Left join master and batting to get the player names in master
-battingPlayer <- left_join(master, batting, by = "playerID")
+battingPlayer <- left_join(batting, master, by = "playerID")
 
 # Base R equivalent:
 # master <- master[, c("playerID", "nameFirst", "nameLast")]
@@ -120,7 +120,8 @@ batting <- left_join(master, batting, by = "playerID") %>%
            select = c("playerID", "nameFirst", "nameLast", "yearID", "stint", "teamID",
                       "lgID", "G", "AB", "R", "H", "X2B", "X3B", "HR", "BB", "HBP", "SF", "SH")) %>%
     left_join(teams[,c("teamID", "yearID", "name")], by = c("teamID", "yearID")) %>%
-    unite(playerName, nameFirst, nameLast, sep=" ") %>% rename(teamName = name)
+    unite(playerName, nameFirst, nameLast, sep=" ") %>% 
+    rename(teamName = name)
 
 # Base R equivalent:
 

@@ -262,7 +262,7 @@ master &lt;- Lahman::Master</code></pre>
 master &lt;- select(master, playerID, nameFirst, nameLast)
 
 # Left join master and batting to get the player names in master
-battingPlayer &lt;- left_join(master, batting, by = &quot;playerID&quot;)
+battingPlayer &lt;- left_join(batting, master, by = &quot;playerID&quot;)
 
 # Base R equivalent:
 # master &lt;- master[, c(&quot;playerID&quot;, &quot;nameFirst&quot;, &quot;nameLast&quot;)]
@@ -278,14 +278,14 @@ batting &lt;- left_join(battingPlayer, teamsYr, by = c(&quot;teamID&quot;, &quot
 # batting &lt;- merge(x = battingPlayer, y = teamsYr, by = c(&quot;tea,ID&quot;, &quot;yearID&quot;), all.x = TRUE)
 
 head(batting, 3)</code></pre>
-<pre><code>##    playerID nameFirst nameLast yearID stint teamID lgID  G AB R H X2B X3B
-## 1 aardsda01     David  Aardsma   2004     1    SFN   NL 11  0 0 0   0   0
-## 2 aardsda01     David  Aardsma   2006     1    CHN   NL 45  2 0 0   0   0
-## 3 aardsda01     David  Aardsma   2007     1    CHA   AL 25  0 0 0   0   0
-##   HR RBI SB CS BB SO IBB HBP SH SF GIDP             teamName
-## 1  0   0  0  0  0  0   0   0  0  0    0 San Francisco Giants
-## 2  0   0  0  0  0  0   0   0  1  0    0         Chicago Cubs
-## 3  0   0  0  0  0  0   0   0  0  0    0    Chicago White Sox</code></pre>
+<pre><code>##    playerID yearID stint teamID lgID  G  AB  R  H X2B X3B HR RBI SB CS BB
+## 1 abercda01   1871     1    TRO   NA  1   4  0  0   0   0  0   0  0  0  0
+## 2  addybo01   1871     1    RC1   NA 25 118 30 32   6   0  0  13  8  1  4
+## 3 allisar01   1871     1    CL1   NA 29 137 28 40   4   5  0  19  3  1  2
+##   SO IBB HBP SH SF GIDP nameFirst    nameLast               teamName
+## 1  0  NA  NA NA NA   NA     Frank Abercrombie         Troy Haymakers
+## 2  0  NA  NA NA NA   NA       Bob        Addy  Rockford Forest Citys
+## 3  5  NA  NA NA NA   NA       Art     Allison Cleveland Forest Citys</code></pre>
 </div>
 <div id="subseting-in-dplyr" class="section level2">
 <h2>Subseting in dplyr</h2>
@@ -306,14 +306,14 @@ batting &lt;- unite(batting, playerName, nameFirst, nameLast, sep=&quot; &quot;)
 # batting &lt;- batting[, c(&quot;playerID&quot;, &quot;name&quot;, &quot;yearID&quot;, &quot;stint&quot;, &quot;teamID&quot;, &quot;teamName&quot;, &quot;lgID&quot;, &quot;G&quot;, &quot;AB&quot;, &quot;R&quot;, &quot;H&quot;, &quot;X2B&quot;, &quot;X3B&quot;, &quot;HR&quot;, &quot;BB&quot;, &quot;HBP&quot;, &quot;SF&quot;, &quot;SH&quot;)]
 
 head(batting, 3)</code></pre>
-<pre><code>##     playerID playerName yearID stint teamID         teamName lgID   G  AB
-## 10 aaronha01 Hank Aaron   1954     1    ML1 Milwaukee Braves   NL 122 468
-## 11 aaronha01 Hank Aaron   1955     1    ML1 Milwaukee Braves   NL 153 602
-## 12 aaronha01 Hank Aaron   1956     1    ML1 Milwaukee Braves   NL 153 609
-##      R   H X2B X3B HR BB HBP SF SH
-## 10  58 131  27   6 13 28   3  4  6
-## 11 105 189  37   9 27 49   3  4  7
-## 12 106 200  34  14 26 37   2  7  5</code></pre>
+<pre><code>##        playerID    playerName yearID stint teamID         teamName lgID
+## 18143 austiji01  Jimmy Austin   1920     1    SLA St. Louis Browns   AL
+## 18152 bancrda01 Dave Bancroft   1920     2    NY1  New York Giants   NL
+## 18154 barbetu01 Turner Barber   1920     1    CHN     Chicago Cubs   NL
+##         G  AB  R   H X2B X3B HR BB HBP SF SH
+## 18143  83 280 38  76  11   3  1 31   4 NA 15
+## 18152 108 442 79 132  29   7  0 33   1 NA 12
+## 18154  94 340 27  90  10   5  0  9   3 NA 17</code></pre>
 </div>
 <div id="using-pipes-in-r" class="section level2">
 <h2>Using pipes in R</h2>
@@ -323,7 +323,8 @@ head(batting, 3)</code></pre>
            select = c(&quot;playerID&quot;, &quot;nameFirst&quot;, &quot;nameLast&quot;, &quot;yearID&quot;, &quot;stint&quot;, &quot;teamID&quot;,
                       &quot;lgID&quot;, &quot;G&quot;, &quot;AB&quot;, &quot;R&quot;, &quot;H&quot;, &quot;X2B&quot;, &quot;X3B&quot;, &quot;HR&quot;, &quot;BB&quot;, &quot;HBP&quot;, &quot;SF&quot;, &quot;SH&quot;)) %&gt;%
     left_join(teams[,c(&quot;teamID&quot;, &quot;yearID&quot;, &quot;name&quot;)], by = c(&quot;teamID&quot;, &quot;yearID&quot;)) %&gt;%
-    unite(playerName, nameFirst, nameLast, sep=&quot; &quot;) %&gt;% rename(teamName = name)
+    unite(playerName, nameFirst, nameLast, sep=&quot; &quot;) %&gt;% 
+    rename(teamName = name)
 
 # Base R equivalent:
 
