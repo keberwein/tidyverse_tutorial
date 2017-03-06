@@ -145,15 +145,14 @@ batting %<>% subset(yearID >= 1900)
 
 ## Calculations and Mutation
 
-**GOAL:** Add two new columns to our data frame `BA` and `PA`, which calculate batting average and plate appearances. The first two lines of code are a base R solution, followed by two solutions using the `mutate()` function from the `dplyr` package.
+**GOAL:** Add two new columns to our data frame `BA` and `OPS`, which calculate batting average and on-base percentage plus slugging percentage. Both calculations can be done as one line of code.
 
 ```{r}
 # This becomes a one-liner with the use of the mutate function and a pipe.
 batting %<>% mutate(BA = H/AB)
 
 # Multimple calculations can be passed to one mutae command.
-batting %<>% mutate(BA = H/AB, 
-                    OBP = (H + BB + IBB + HBP) / (AB + BB + IBB + HBP + SF + SH ))
+batting %<>% mutate(BA = H/AB, OBS = (H+BB+IBB+HBP)/(AB+BB+IBB+HBP+SF+SH)+((H+2*X2B+3*X3B+4*HR)/AB))
 
 # Base R equivalent:
 # batting$BA <- batting$H / batting$AB

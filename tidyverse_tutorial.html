@@ -349,13 +349,12 @@ batting %&lt;&gt;% subset(yearID &gt;= 1900)</code></pre>
 </div>
 <div id="calculations-and-mutation" class="section level2">
 <h2>Calculations and Mutation</h2>
-<p><strong>GOAL:</strong> Add two new columns to our data frame <code>BA</code> and <code>PA</code>, which calculate batting average and plate appearances. The first two lines of code are a base R solution, followed by two solutions using the <code>mutate()</code> function from the <code>dplyr</code> package.</p>
+<p><strong>GOAL:</strong> Add two new columns to our data frame <code>BA</code> and <code>OPS</code>, which calculate batting average and on-base percentage plus slugging percentage. Both calculations can be done as one line of code.</p>
 <pre class="r"><code># This becomes a one-liner with the use of the mutate function and a pipe.
 batting %&lt;&gt;% mutate(BA = H/AB)
 
 # Multimple calculations can be passed to one mutae command.
-batting %&lt;&gt;% mutate(BA = H/AB, 
-                    OBP = (H + BB + IBB + HBP) / (AB + BB + IBB + HBP + SF + SH ))
+batting %&lt;&gt;% mutate(BA = H/AB, OBS = (H+BB+IBB+HBP)/(AB+BB+IBB+HBP+SF+SH)+((H+2*X2B+3*X3B+4*HR)/AB))
 
 # Base R equivalent:
 # batting$BA &lt;- batting$H / batting$AB
@@ -370,10 +369,10 @@ head(batting, 3)</code></pre>
 ## 1 49 61   5   3  7  4   20 Hank Aaron  Milwaukee Braves 0.3139535
 ## 2 89 69   2   3  3  3    6 Cal Abrams Baltimore Orioles 0.2427184
 ## 3 31 44   3   2  2  1   13 Joe Adcock  Milwaukee Braves 0.2638889
-##         OBP
-## 1 0.3671642
-## 2 0.4132029
-## 3 0.3425076</code></pre>
+##         OBS
+## 1 1.0282937
+## 2 0.8403874
+## 3 0.9119521</code></pre>
 </div>
 <div id="grouping-and-aggregating" class="section level2">
 <h2>Grouping and Aggregating</h2>
