@@ -103,7 +103,6 @@ batting <- unite(batting, playerName, nameFirst, nameLast, sep=" ")
 # Base R equivalent:
 # batting <- subset(batting, yearID >= 1920 & AB >= 200)
 # batting <- transform(batting, playerName = paste0(nameFirst, " ", nameLast))
-# batting <- batting[, c("playerID", "playerName", "yearID", "stint", "teamID", "teamName", "lgID", "G", "AB", "R", "H", "X2B", "X3B", "HR", "BB", "HBP", "SF", "SH")]
 
 head(batting, 3)
 ```
@@ -156,7 +155,9 @@ batting %<>% mutate(BA = H/AB, OBS = (H+BB+IBB+HBP)/(AB+BB+IBB+HBP+SF+SH)+((H+2*
 
 # Base R equivalent:
 # batting$BA <- batting$H / batting$AB
-# batting$PA <- batting$AB + batting$BB + batting$HBP + batting$SF + batting$SH
+# batting$OPS <- ((batting$H + batting$BB + batting$IBB + batting$HBP) / 
+# (batting$AB + batting$BB + batting$IBB + batting$HBP + batting$SF + batting$SH) +
+# (batting$H + 2 * batting$X2B + 3 * batting$X3B + 4 * batting$HR) / batting$AB)
 
 head(batting, 3)
 ```
@@ -172,8 +173,7 @@ Like joins, grouping and aggregating adhere to concepts found in SQL. The data f
 ```{r}
 batting <- Lahman::Batting
 # Grouped calculations
-moonShot <- batting %>% group_by(playerID) %>% 
-    summarise(careerHR = sum(HR)) %>% arrange(desc(careerHR))
+moonShot <- group_by(batting, playerID) %>% summarise(careerHR = sum(HR)) %>% arrange(desc(careerHR))
 
 # Base R equivalent:
 # moonShot <- batting
@@ -194,8 +194,7 @@ Set the batting table "wide" with a column for each year using the `spread()` fu
 ```{r}
 batting <- Lahman::Batting
 
-BattingLong <- batting %>% filter(yearID >= 2000 & AB >=200) %>% group_by(playerID, yearID) %>% 
-    summarize(HR = sum(HR))
+BattingLong <- batting %>% filter(yearID >= 2000 & AB >=200) %>% group_by(playerID, yearID) %>% summarize(HR = sum(HR))
 
 BattingWide <- spread(BattingLong, key=yearID, value=HR)
 
@@ -277,4 +276,3 @@ Table borrowed from the `reticulate` [documentation](https://github.com/rstudio/
 | List of multiple types | Tuple             | `list(1L, TRUE, "foo")`                     |
 | Named list             | Dict              | `list(a = 1L, b = 2.0)`, `dict(x = x_data)` |
 | Matrix/Array           | NumPy ndarray     | `matrix(c(1,2,3,4), nrow = 2, ncol = 2)`    |
-| NULL, TRUE, FALSE      | None, True, False | `NULL`, `TRUE`, `FALSE`                     |

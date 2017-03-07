@@ -301,7 +301,6 @@ batting &lt;- unite(batting, playerName, nameFirst, nameLast, sep=&quot; &quot;)
 # Base R equivalent:
 # batting &lt;- subset(batting, yearID &gt;= 1920 &amp; AB &gt;= 200)
 # batting &lt;- transform(batting, playerName = paste0(nameFirst, &quot; &quot;, nameLast))
-# batting &lt;- batting[, c(&quot;playerID&quot;, &quot;playerName&quot;, &quot;yearID&quot;, &quot;stint&quot;, &quot;teamID&quot;, &quot;teamName&quot;, &quot;lgID&quot;, &quot;G&quot;, &quot;AB&quot;, &quot;R&quot;, &quot;H&quot;, &quot;X2B&quot;, &quot;X3B&quot;, &quot;HR&quot;, &quot;BB&quot;, &quot;HBP&quot;, &quot;SF&quot;, &quot;SH&quot;)]
 
 head(batting, 3)</code></pre>
 <pre><code>##        playerID yearID stint teamID lgID   G  AB   R   H X2B X3B HR RBI SB
@@ -358,7 +357,9 @@ batting %&lt;&gt;% mutate(BA = H/AB, OBS = (H+BB+IBB+HBP)/(AB+BB+IBB+HBP+SF+SH)+
 
 # Base R equivalent:
 # batting$BA &lt;- batting$H / batting$AB
-# batting$PA &lt;- batting$AB + batting$BB + batting$HBP + batting$SF + batting$SH
+# batting$OPS &lt;- ((batting$H + batting$BB + batting$IBB + batting$HBP) / 
+# (batting$AB + batting$BB + batting$IBB + batting$HBP + batting$SF + batting$SH) +
+# (batting$H + 2 * batting$X2B + 3 * batting$X3B + 4 * batting$HR) / batting$AB)
 
 head(batting, 3)</code></pre>
 <pre><code>##    playerID yearID stint teamID lgID   G  AB   R   H X2B X3B HR RBI SB CS
@@ -381,8 +382,7 @@ head(batting, 3)</code></pre>
 <p><em>If we did it right, we should see Barry Bonds and Hank Aaron at the top of the list.</em></p>
 <pre class="r"><code>batting &lt;- Lahman::Batting
 # Grouped calculations
-moonShot &lt;- batting %&gt;% group_by(playerID) %&gt;% 
-    summarise(careerHR = sum(HR)) %&gt;% arrange(desc(careerHR))
+moonShot &lt;- group_by(batting, playerID) %&gt;% summarise(careerHR = sum(HR)) %&gt;% arrange(desc(careerHR))
 
 # Base R equivalent:
 # moonShot &lt;- batting
@@ -404,8 +404,7 @@ head(moonShot, 3)</code></pre>
 <p>Set the batting table “wide” with a column for each year using the <code>spread()</code> function. This would be particularly helpful if plotting or visualizing the data.</p>
 <pre class="r"><code>batting &lt;- Lahman::Batting
 
-BattingLong &lt;- batting %&gt;% filter(yearID &gt;= 2000 &amp; AB &gt;=200) %&gt;% group_by(playerID, yearID) %&gt;% 
-    summarize(HR = sum(HR))
+BattingLong &lt;- batting %&gt;% filter(yearID &gt;= 2000 &amp; AB &gt;=200) %&gt;% group_by(playerID, yearID) %&gt;% summarize(HR = sum(HR))
 
 BattingWide &lt;- spread(BattingLong, key=yearID, value=HR)
 
@@ -512,11 +511,6 @@ ggplot(batting, aes(BA, R)) +
 <td>Matrix/Array</td>
 <td>NumPy ndarray</td>
 <td><code>matrix(c(1,2,3,4), nrow = 2, ncol = 2)</code></td>
-</tr>
-<tr class="even">
-<td>NULL, TRUE, FALSE</td>
-<td>None, True, False</td>
-<td><code>NULL</code>, <code>TRUE</code>, <code>FALSE</code></td>
 </tr>
 </tbody>
 </table>
