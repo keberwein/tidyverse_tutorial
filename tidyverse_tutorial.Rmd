@@ -265,3 +265,16 @@ We can see by the plot that there seems to be a relationship between batting ave
 * SH = Sacrifice Hit
 
 * Stint = How many times a player was a member of a team in one season. Example, if `Stint=2`, the player was traded to another team, then re-acquired by his first team in the same season.
+
+## R / Python Terminology
+
+Table borrowed from the `reticulate` [documentation](https://github.com/rstudio/reticulate).
+
+| R                      | Python            | Examples                                    |
+|------------------------|-------------------|---------------------------------------------|
+| Single-element vector  | Scalar            | `1`, `1L`, `TRUE`, `"foo"`                  |
+| Multi-element vector   | List              | `c(1.0, 2.0, 3.0)`, `c(1L, 2L, 3L)`         |
+| List of multiple types | Tuple             | `list(1L, TRUE, "foo")`                     |
+| Named list             | Dict              | `list(a = 1L, b = 2.0)`, `dict(x = x_data)` |
+| Matrix/Array           | NumPy ndarray     | `matrix(c(1,2,3,4), nrow = 2, ncol = 2)`    |
+| NULL, TRUE, FALSE      | None, True, False | `NULL`, `TRUE`, `FALSE`                     |

@@ -476,6 +476,51 @@ ggplot(batting, aes(BA, R)) +
 </ul>
 </div>
 </div>
+<div id="r-python-terminology" class="section level2">
+<h2>R / Python Terminology</h2>
+<p>Table borrowed from the <code>reticulate</code> <a href="https://github.com/rstudio/reticulate">documentation</a>.</p>
+<table>
+<thead>
+<tr class="header">
+<th>R</th>
+<th>Python</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Single-element vector</td>
+<td>Scalar</td>
+<td><code>1</code>, <code>1L</code>, <code>TRUE</code>, <code>&quot;foo&quot;</code></td>
+</tr>
+<tr class="even">
+<td>Multi-element vector</td>
+<td>List</td>
+<td><code>c(1.0, 2.0, 3.0)</code>, <code>c(1L, 2L, 3L)</code></td>
+</tr>
+<tr class="odd">
+<td>List of multiple types</td>
+<td>Tuple</td>
+<td><code>list(1L, TRUE, &quot;foo&quot;)</code></td>
+</tr>
+<tr class="even">
+<td>Named list</td>
+<td>Dict</td>
+<td><code>list(a = 1L, b = 2.0)</code>, <code>dict(x = x_data)</code></td>
+</tr>
+<tr class="odd">
+<td>Matrix/Array</td>
+<td>NumPy ndarray</td>
+<td><code>matrix(c(1,2,3,4), nrow = 2, ncol = 2)</code></td>
+</tr>
+<tr class="even">
+<td>NULL, TRUE, FALSE</td>
+<td>None, True, False</td>
+<td><code>NULL</code>, <code>TRUE</code>, <code>FALSE</code></td>
+</tr>
+</tbody>
+</table>
+</div>
 
 
 
