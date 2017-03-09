@@ -10,7 +10,7 @@ output:
 ---
 ```{r setup, include=FALSE, warning=FALSE}
 # Make sure all the required packages are installed on the system.
-pkgs <-c('Lahman','dplyr', 'tidyr', 'magrittr')
+pkgs <-c('Lahman','dplyr', 'tidyr', 'magrittr', 'ggplot2')
 for(p in pkgs) if(p %in% rownames(installed.packages()) == FALSE) {install.packages(p, repos='http://cran.us.r-project.org')}
 options("getSymbols.warning4.0"=FALSE)
 ```
@@ -151,7 +151,7 @@ batting %<>% subset(yearID >= 1900)
 batting %<>% mutate(BA = H/AB)
 
 # Multimple calculations can be passed to one mutae command.
-batting %<>% mutate(BA = H/AB, OBS = (H+BB+IBB+HBP)/(AB+BB+IBB+HBP+SF+SH)+((H+2*X2B+3*X3B+4*HR)/AB))
+batting %<>% mutate(BA = H/AB, OPS = (H+BB+IBB+HBP)/(AB+BB+IBB+HBP+SF+SH)+((H+2*X2B+3*X3B+4*HR)/AB))
 
 # Base R equivalent:
 # batting$BA <- batting$H / batting$AB
