@@ -223,6 +223,7 @@ The default visualization in the R language is the `plot()` function from base R
 batting <- Lahman::Batting
 
 # Subset for players who had at least one at-bat, group by year, aggregate, and calculate a league batting average.
+# Use summarize function in case of multiple sints.
 batting %<>% subset(AB >= 200 & yearID >= 1920) %>% group_by(yearID, playerID) %>% 
     summarise(H = sum(H), AB = sum(AB), R = sum(R)) %>% mutate(BA = H/AB)
 ```
