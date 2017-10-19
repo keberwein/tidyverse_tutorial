@@ -26,6 +26,9 @@ library(Lahman)
 library(dplyr)
 library(tidyr)
 library(magrittr)
+
+# NOTE: The dplyr and tidyr packages can be called at one time via the tidyverse package
+# library(tidyverse)
 ```
 
 ## Loading Data
